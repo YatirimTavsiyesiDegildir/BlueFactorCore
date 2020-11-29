@@ -6,8 +6,10 @@ import os
 import threading
 import socket
 from getpass import getpass
+import logging
 
-PORT = 8008
+PORT = 8000
+KEYFILE = "keyfile2"
 
 
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -16,42 +18,65 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.path = 'keyfile'
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
+    # def do_POST(self):
+    #     # <--- Gets the size of data
+    #     content_length = int(self.headers['Content-Length'])
+    #     # <--- Gets the data itself
+    #     post_data = self.rfile.read(content_length)
+    #     logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
+    #                  str(self.path), str(self.headers), post_data.decode('utf-8'))
+
+    #     # self.set_response()
+    #     self.wfile.write("POST request for {}".format(
+    #         self.path).encode('utf-8'))
+
     def do_POST(self):
-        r, info = self.deal_post_data()
-        print(r, info, "by: ", self.client_address)
-        f = io.BytesIO()
-        if r:
-            f.write(b"Success\n")
-        else:
-            f.write(b"Failed\n")
-        length = f.tell()
-        f.seek(0)
+        # r, info = self.deal_post_data()
+        # print(r, info, "by: ", self.client_address)
+        # f = io.BytesIO()
+        # if r:
+        #     f.write(b"Success\n")
+        # else:
+        #     f.write(b"Failed\n")
+        # length = f.tell()
+        # f.seek(0)
+        # <--- Gets the size of data
+        content_length = int(self.headers['Content-Length'])
+        # <--- Gets the data itself
+        post_data = self.rfile.read(content_length)
+        print(post_data)
+        f = open(KEYFILE, "w")
+        f.write(str(post_data)[2: -1])
+        f.close()
+        # os.system('echo "' + str(post_data)[2: -1] + '" > ' + KEYFILE)
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
-        self.send_header("Content-Length", str(length))
+        # self.send_header("Content-Length", str(length))
         self.end_headers()
-        if f:
-            self.copyfile(f, self.wfile)
-            f.close()
+        # if f:
+        #     self.copyfile(f, self.wfile)
+        #     f.close()
 
     def deal_post_data(self):
-        ctype, pdict = cgi.parse_header(self.headers['Content-Type'])
-        pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
-        pdict['CONTENT-LENGTH'] = int(self.headers['Content-Length'])
-        if ctype == 'multipart/form-data':
-            form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={
-                                    'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type'], })
-            print(type(form))
-            try:
-                if isinstance(form["file"], list):
-                    for record in form["file"]:
-                        open("./%s" % record.filename,
-                             "wb").write(record.file.read())
-                else:
-                    open("./%s" % form["file"].filename,
-                         "wb").write(form["file"].file.read())
-            except IOError:
-                return (False, "Can't create file to write, do you have permission to write?")
+
+        # ctype, pdict = cgi.parse_header(self.headers['Content-Type'])
+        # print(self.body)
+        # pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
+        # pdict['CONTENT-LENGTH'] = int(self.headers['Content-Length'])
+        # if ctype == 'multipart/form-data':
+        #     form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={
+        #                             'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type'], })
+        #     print(type(form))
+        #     try:
+        #         if isinstance(form["file"], list):
+        #             for record in form["file"]:
+        #                 open("./%s" % record.filename,
+        #                      "wb").write(record.file.read())
+        #         else:
+        #             open("./%s" % form["file"].filename,
+        #                  "wb").write(form["file"].file.read())
+        #     except IOError:
+        #         return (False, "Can't create file to write, do you have permission to write?")
         return (True, "Files uploaded")
 
 
