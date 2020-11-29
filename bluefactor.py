@@ -106,7 +106,7 @@ def encrypt_sequence():
         password = input("Enter password: ")
         size = input(" Enter size for the file")
         keyname = input(" Enter key file name")
-        os.system("veracrypt -t -c test")
+        os.system("veracrypt --create test.vc --password %s --hash sha512 --encryption AES --create-keyfile %s --volume-type normal --pim 0 --filesystem FAT --size %s --force" %(password,keyname,size))
 
     # await_key_request()
     # encrypt()
