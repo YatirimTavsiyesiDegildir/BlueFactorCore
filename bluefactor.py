@@ -9,7 +9,7 @@ from getpass import getpass
 import logging
 import secrets
 
-PORT = 7002
+PORT = 7001
 KEYFILE = "keyfile.key"
 
 
@@ -84,10 +84,10 @@ def encrypt_sequence():
     size = str.rstrip(input(" Enter size for the file: "))
     os.system("veracrypt -t --create %s --password %s --hash sha512 --encryption AES --keyfiles %s --volume-type normal --pim 0 --filesystem FAT --size %s --force" %
               (folder, password, KEYFILE, size))
-    print("Please upload the key to the app.")
+    print("Please download the companion application here: \nhttps://github.com/WaitttForIt/BlueFactorApp \nand upload the key to the app.")
     inp = input("\n[y] Key uploaded.")
     while inp != "y":
-        inp = input("\n[y] Key uploaded.")
+        inp = input("[y] Key uploaded.")
     os.system("rm " + KEYFILE)
     print("Done!")
 
@@ -96,7 +96,7 @@ def decrypt_sequence():
     print("Please upload the key from the app.")
     inp = input("\n[y] Key uploaded.")
     while inp != "y":
-        inp = input("\n[y] Key uploaded.")
+        inp = input("[y] Key uploaded.")
     mount = str.rstrip(input("Enter mount name: "))
     password = str.rstrip(getpass("Enter password: "))
     os.system("veracrypt --mount %s --password %s --keyfiles %s" %
