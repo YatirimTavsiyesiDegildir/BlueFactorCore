@@ -53,12 +53,19 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
         return (True, "Files uploaded")
 
 
-# Create an object of the above class
-handler_object = MyHttpRequestHandler
+def start_server():
+    # Create an object of the above class
+    handler_object = MyHttpRequestHandler
 
-with socketserver.TCPServer(("", PORT), handler_object) as httpd:
-    # Star the server
-    httpd.serve_forever()
+    with socketserver.TCPServer(("", PORT), handler_object) as httpd:
+        # Star the server
+        httpd.serve_forever()
+
+
+daemon = threading.Thread(name='daemon_server',
+                          target=start_server)
+daemon.setDaemon(True)
+daemon.start()
 
 
 def display_title():
