@@ -1,1 +1,5 @@
 *.key
+
+.idea/inspectionProfiles/Project_Default.xml
+
+.idea/workspace.xml
