@@ -18,6 +18,7 @@ KEYFILE = "keyfile.key"
 key_uploaded_to_phone = False
 key_downloaded_from_phone = False
 
+
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if os.path.isfile(KEYFILE) and self.path == '/':
@@ -90,10 +91,14 @@ def encrypt_sequence():
     folder = str.rstrip(input("Enter encrypted folder name: "))
     password = str.rstrip(getpass("Enter password: "))
     size = str.rstrip(input(" Enter size for the file: "))
-    os.system("veracrypt -t --create %s --password %s --hash sha512 --encryption AES --keyfiles %s --volume-type normal --pim 0 --filesystem FAT --size %s --force" %
-              (folder, password, KEYFILE, size))
+    os.system(
+        "veracrypt -t --create %s --password %s --hash sha512 --encryption AES --keyfiles %s --volume-type normal --pim 0 --filesystem FAT --size %s --force" %
+        (folder, password, KEYFILE, size))
+    print(
+        "1. Please download the companion application here: \nhttps://github.com/WaitttForIt/BlueFactorApp \n\n"
+        "2. Download the key from the app.\n"
+        "Using: %s" % (ip))
     '''
-    print("Please download the companion application here: \nhttps://github.com/WaitttForIt/BlueFactorApp \nand upload the key to the app.")
     inp = input("\n[y] Key uploaded.")
     while inp != "y":
         inp = input("\n[y] Key uploaded.")
@@ -107,7 +112,9 @@ def encrypt_sequence():
 
 def decrypt_sequence():
     global key_downloaded_from_phone
-    print("Please upload the key from the app.")
+    print(
+        "1. Upload the key from the application.\n"
+        "Using: %s" % (ip))
     '''
     inp = input("\n[y] Key uploaded.")
     while inp != "y":
