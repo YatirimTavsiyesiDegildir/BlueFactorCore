@@ -2,7 +2,8 @@ import http.server
 import socketserver
 import io
 import cgi
-
+import os
+import threading
 
 PORT = 8008
 
@@ -58,3 +59,47 @@ handler_object = MyHttpRequestHandler
 with socketserver.TCPServer(("", PORT), handler_object) as httpd:
     # Star the server
     httpd.serve_forever()
+
+
+def display_title():
+    os.system("clear")
+    print("\t**********************************************")
+    print("\t***  BlueFactor - 2FA Bluetooth Encryptor  ***")
+    print("\t***  BlueFactor - 2FA Bluetooth Encryptor  ***")
+    print("\t**********************************************")
+
+
+def get_user_choice():
+    print("\n[1] Create encrypted folder.")
+    print("[2] Decrypt folder.")
+    print("[q] Quit.")
+
+    return input("What would you like to do? ")
+
+
+def encrypt_sequence():
+    password = input("Enter password: ")
+    size = input(" Enter size for the file")
+    keyname = input(" Enter key file name")
+    os.system("veracrypt --create test.vc --password %s --hash sha512 --encryption AES --create-keyfile %s --volume-type normal --pim 0 --filesystem FAT --size %s --force" % (password, keyname, size))
+
+
+def decrypt_sequence():
+    # to do
+    return 0
+
+
+choice = ""
+display_title()
+
+while choice != "q":
+    choice = get_user_choice()
+
+    if choice == "1":
+        encrypt_sequence()
+    elif choice == "2":
+        decrypt_sequence()
+    elif choice == "q":
+        print("\nThanks for using BlueFactor!")
+    else:
+        print("\nUnknown choice.")
