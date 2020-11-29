@@ -7,16 +7,21 @@ import threading
 import socket
 from getpass import getpass
 import logging
+import secrets
 
-PORT = 8000
-KEYFILE = "keyfile2"
+PORT = 7002
+KEYFILE = "keyfile.key"
 
 
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        if self.path == '/':
-            self.path = 'keyfile'
-        return http.server.SimpleHTTPRequestHandler.do_GET(self)
+        if os.path.isfile(KEYFILE) and self.path == '/':
+            self.path = KEYFILE
+            return http.server.SimpleHTTPRequestHandler.do_GET(self)
+        self.send_response(404)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+        return False
 
     def do_POST(self):
         # <--- Gets the size of data
@@ -69,20 +74,34 @@ def get_user_choice():
 
 
 def encrypt_sequence():
+    keyfileText = secrets.token_urlsafe(10000)
+    f = open(KEYFILE, "w")
+    f.write(keyfileText)
+    f.close()
+
     folder = str.rstrip(input("Enter encrypted folder name: "))
     password = str.rstrip(getpass("Enter password: "))
     size = str.rstrip(input(" Enter size for the file: "))
-    keyname = str.rstrip(input(" Enter key file name: "))
     os.system("veracrypt -t --create %s --password %s --hash sha512 --encryption AES --keyfiles %s --volume-type normal --pim 0 --filesystem FAT --size %s --force" %
-              (folder, password, keyname, size))
+              (folder, password, KEYFILE, size))
+    print("Please upload the key to the app.")
+    inp = input("\n[y] Key uploaded.")
+    while inp != "y":
+        inp = input("\n[y] Key uploaded.")
+    os.system("rm " + KEYFILE)
+    print("Done!")
 
 
 def decrypt_sequence():
-    mount = str.rstrip(input("Enter mount location: "))
+    print("Please upload the key from the app.")
+    inp = input("\n[y] Key uploaded.")
+    while inp != "y":
+        inp = input("\n[y] Key uploaded.")
+    mount = str.rstrip(input("Enter mount name: "))
     password = str.rstrip(getpass("Enter password: "))
-    keyname = str.rstrip(input("Enter keyfile: "))
     os.system("veracrypt --mount %s --password %s --keyfiles %s" %
-              (mount, password, keyname))
+              (mount, password, KEYFILE))
+    os.system("rm " + KEYFILE)
 
 
 def unmount_sequence():
