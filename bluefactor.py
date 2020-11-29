@@ -8,15 +8,21 @@ import socket
 from getpass import getpass
 import logging
 import secrets
+import time
 
-PORT = 7001
+# Constants
+PORT = 7002
 KEYFILE = "keyfile.key"
 
+# Globals
+key_uploaded_to_phone = False
+key_downloaded_from_phone = False
 
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if os.path.isfile(KEYFILE) and self.path == '/':
             self.path = KEYFILE
+            key_uploaded_to_phone = True
             return http.server.SimpleHTTPRequestHandler.do_GET(self)
         self.send_response(404)
         self.send_header("Content-type", "text/plain")
@@ -35,6 +41,7 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
         self.end_headers()
+        key_downloaded_from_phone = True
 
 
 def start_server():
@@ -74,6 +81,7 @@ def get_user_choice():
 
 
 def encrypt_sequence():
+    global key_uploaded_to_phone
     keyfileText = secrets.token_urlsafe(10000)
     f = open(KEYFILE, "w")
     f.write(keyfileText)
@@ -84,19 +92,30 @@ def encrypt_sequence():
     size = str.rstrip(input(" Enter size for the file: "))
     os.system("veracrypt -t --create %s --password %s --hash sha512 --encryption AES --keyfiles %s --volume-type normal --pim 0 --filesystem FAT --size %s --force" %
               (folder, password, KEYFILE, size))
+    '''
     print("Please download the companion application here: \nhttps://github.com/WaitttForIt/BlueFactorApp \nand upload the key to the app.")
     inp = input("\n[y] Key uploaded.")
     while inp != "y":
-        inp = input("[y] Key uploaded.")
+        inp = input("\n[y] Key uploaded.")
+    '''
+    print("Waiting for phone to get the key...")
+    while not key_uploaded_to_phone:
+        time.sleep(1)
     os.system("rm " + KEYFILE)
     print("Done!")
 
 
 def decrypt_sequence():
+    global key_downloaded_from_phone
     print("Please upload the key from the app.")
+    '''
     inp = input("\n[y] Key uploaded.")
     while inp != "y":
-        inp = input("[y] Key uploaded.")
+        inp = input("\n[y] Key uploaded.")
+    '''
+    print("Waiting for phone to send the key...")
+    while not key_downloaded_from_phone:
+        time.sleep(1)
     mount = str.rstrip(input("Enter mount name: "))
     password = str.rstrip(getpass("Enter password: "))
     os.system("veracrypt --mount %s --password %s --keyfiles %s" %
