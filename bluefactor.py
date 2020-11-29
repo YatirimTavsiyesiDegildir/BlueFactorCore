@@ -104,6 +104,8 @@ def encrypt_sequence():
 
     def encrypt():
         password = input("Enter password: ")
+        size = input(" Enter size for the file")
+        keyname = input(" Enter key file name")
         os.system("veracrypt -t -c test")
 
     # await_key_request()
