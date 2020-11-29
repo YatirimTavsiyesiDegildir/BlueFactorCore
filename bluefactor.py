@@ -9,9 +9,10 @@ from getpass import getpass
 import logging
 import secrets
 import time
+import pyqrcode
 
 # Constants
-PORT = 7004
+PORT = 7006
 KEYFILE = "keyfile.key"
 
 # Globals
@@ -70,7 +71,7 @@ def display_title():
     os.system("clear")
     print("\t**********************************************")
     print("\t***       BlueFactor - 2FA Encryptor       ***")
-    print("\t***           %s          ***" % (ip))
+    print("\t***           %s            ***" % (ip))
     print("\t**********************************************")
 
 
@@ -96,11 +97,12 @@ def encrypt_sequence():
     os.system(
         "veracrypt -t --create %s --password %s --hash sha512 --encryption AES --keyfiles %s --volume-type normal --pim 0 --filesystem FAT --size %s --force" %
         (folder, password, KEYFILE, size))
+    qrcode = pyqrcode.create(ip)
     print(
         "1. Please download the companion application here: \nhttps://github.com/WaitttForIt/BlueFactorApp \n\n"
         "2. Download the key from the app.\n"
         "Using: %s" % (ip))
-
+    print(qrcode.terminal(quiet_zone=1))
     print("Waiting for phone to get the key...")
     while not key_uploaded_to_phone:
         time.sleep(1)
@@ -111,10 +113,11 @@ def encrypt_sequence():
 
 def decrypt_sequence():
     global key_downloaded_from_phone
+    qrcode = pyqrcode.create(ip)
     print(
         "1. Upload the key from the application.\n"
         "Using: %s" % (ip))
-
+    print(qrcode.terminal(quiet_zone=1))
     print("Waiting for phone to send the key...")
     while not key_downloaded_from_phone:
         time.sleep(1)
