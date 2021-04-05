@@ -10,7 +10,6 @@ Bluefactor is a python program enabling two-factor authentication using a mobile
 - Clone BlueFactorCore. (`git clone https://github.com/Blue-Factor/BlueFactorCore.git`)
 - `cd BlueFactorCore && pip3 install -r requirements.txt`
 - `python3 bluefactor.py`
-- <TODO>
 ## Dependencies
 - Python3
 - Veracrypt
